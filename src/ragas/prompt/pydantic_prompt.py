@@ -4,6 +4,8 @@ import copy
 import json
 import logging
 import os
+import hashlib
+
 import typing as t
 
 from langchain_core.exceptions import OutputParserException
@@ -226,12 +228,7 @@ class PydanticPrompt(BasePrompt, t.Generic[InputModel, OutputModel]):
         """
         Adapt the prompt to a new language.
         """
-
-        # set the original hash, this is used to
-        # identify the original prompt object when loading from file
-        if self.original_hash is None:
-            self.original_hash = hash(self)
-
+        
         strings = get_all_strings(self.examples)
         translated_strings = await translate_statements_prompt.generate(
             llm=llm,
@@ -257,6 +254,8 @@ class PydanticPrompt(BasePrompt, t.Generic[InputModel, OutputModel]):
             )
             new_prompt.instruction = translated_instruction.statements[0]
 
+        new_prompt.original_hash = hash(new_prompt)
+
         return new_prompt
 
     def __repr__(self):
@@ -276,7 +275,7 @@ class PydanticPrompt(BasePrompt, t.Generic[InputModel, OutputModel]):
             ensure_ascii=False,
         )[1:-1]
         return f"{self.__class__.__name__}({json_str})"
-
+        
     def __hash__(self):
         # convert examples to json string for hashing
         examples = []
@@ -285,19 +284,23 @@ class PydanticPrompt(BasePrompt, t.Generic[InputModel, OutputModel]):
             examples.append(
                 (input_model.model_dump_json(), output_model.model_dump_json())
             )
-
-        # not sure if input_model and output_model should be included
-        return hash(
-            (
-                self.name,
-                self.input_model,
-                self.output_model,
-                self.instruction,
-                *examples,
-                self.language,
-            )
-        )
-
+    
+        # create a SHA-256 hash object
+        hasher = hashlib.sha256()
+    
+        # update the hash object with the bytes of each attribute
+        hasher.update(self.name.encode('utf-8'))
+        hasher.update(self.input_model.__name__.encode('utf-8'))
+        hasher.update(self.output_model.__name__.encode('utf-8'))
+        hasher.update(self.instruction.encode('utf-8'))
+        for example in examples:
+            hasher.update(example[0].encode('utf-8'))
+            hasher.update(example[1].encode('utf-8'))
+        hasher.update(self.language.encode('utf-8'))
+    
+        # return the integer value of the hash
+        return int(hasher.hexdigest(), 16)
+    
     def __eq__(self, other):
         if not isinstance(other, PydanticPrompt):
             return False
@@ -328,13 +331,13 @@ class PydanticPrompt(BasePrompt, t.Generic[InputModel, OutputModel]):
         }
         if os.path.exists(file_path):
             raise FileExistsError(f"The file '{file_path}' already exists.")
-        with open(file_path, "w") as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
             print(f"Prompt saved to {file_path}")
 
     @classmethod
     def load(cls, file_path: str) -> "PydanticPrompt[InputModel, OutputModel]":
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         # You might want to add version compatibility checks here
