@@ -24,6 +24,7 @@ if t.TYPE_CHECKING:
     from langchain_core.prompt_values import PromptValue
     from llama_index.core.base.llms.base import BaseLLM
 
+
 logger = logging.getLogger(__name__)
 
 MULTIPLE_COMPLETION_SUPPORTED = [
@@ -159,8 +160,9 @@ class LangchainLLMWrapper(BaseRagasLLM):
                 if finish_reason is not None:
                     # OpenAI uses "stop"
                     # Vertex AI uses "STOP" or "MAX_TOKENS"
+                    # WatsonX AI uses "eos_token"
                     is_finished_list.append(
-                        finish_reason in ["stop", "STOP", "MAX_TOKENS"]
+                        finish_reason in ["stop", "STOP", "MAX_TOKENS", "eos_token"]
                     )
 
                 # provied more conditions here
@@ -177,12 +179,13 @@ class LangchainLLMWrapper(BaseRagasLLM):
                 if resp_message.response_metadata.get("finish_reason") is not None:
                     finish_reason = resp_message.response_metadata.get("finish_reason")
                     is_finished_list.append(
-                        finish_reason in ["stop", "STOP", "MAX_TOKENS"]
+                        finish_reason in ["stop", "STOP", "MAX_TOKENS", "eos_token"]
                     )
                 elif resp_message.response_metadata.get("stop_reason") is not None:
                     stop_reason = resp_message.response_metadata.get("stop_reason")
                     is_finished_list.append(
-                        stop_reason in ["end_turn", "STOP", "MAX_TOKENS"]
+                        stop_reason
+                        in ["end_turn", "stop", "STOP", "MAX_TOKENS", "eos_token"]
                     )
             # default to True
             else:

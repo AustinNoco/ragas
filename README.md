@@ -40,6 +40,9 @@ Objective metrics, intelligent test generation, and data-driven insights for LLM
 Ragas is your ultimate toolkit for evaluating and optimizing Large Language Model (LLM) applications. Say goodbye to time-consuming, subjective assessments and hello to data-driven, efficient evaluation workflows.
 Don't have a test dataset ready? We also do production-aligned test set generation.
 
+> [!NOTE]
+> Need help setting up Evals for your AI application? We'd love to help! We are conducting Office Hours every week. You can sign up [here](https://cal.com/team/ragas/office-hours).
+
 ## Key Features
 
 - 🎯 Objective Metrics: Evaluate your LLM applications with precision using both LLM-based and traditional metrics.
@@ -84,7 +87,7 @@ Find the complete [Quickstart Guide](https://docs.ragas.io/en/latest/getstarted/
 
 ### Analyze your Evaluation
 
-Sign up for [app.ragas.io]() to review, share and analyze your evaluations</a>
+Sign up for [app.ragas.io](https://app.ragas.io) to review, share and analyze your evaluations</a>
 
 <p align="left">
     <img src="docs/getstarted/ragas_get_started_evals.gif" height="300">
