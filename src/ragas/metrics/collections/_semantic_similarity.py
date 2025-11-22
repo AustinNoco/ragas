@@ -1,4 +1,4 @@
-"""Answer Similarity metric."""
+"""Semantic Similarity metric."""
 
 import typing as t
 
@@ -11,21 +11,25 @@ if t.TYPE_CHECKING:
     from ragas.embeddings.base import BaseRagasEmbedding
 
 
-class AnswerSimilarity(BaseMetric):
+class SemanticSimilarity(BaseMetric):
     """
     Evaluate semantic similarity between reference and response using embeddings.
+
+    Scores the semantic similarity of ground truth with generated answer using
+    cosine similarity of embeddings. Based on the SAS paper:
+    https://arxiv.org/pdf/2108.06130.pdf
 
     Usage:
         >>> from openai import AsyncOpenAI
         >>> from ragas.embeddings.base import embedding_factory
-        >>> from ragas.metrics.collections import AnswerSimilarity
+        >>> from ragas.metrics.collections import SemanticSimilarity
         >>>
         >>> # Setup embeddings
         >>> client = AsyncOpenAI()
         >>> embeddings = embedding_factory("openai", model="text-embedding-ada-002", client=client, interface="modern")
         >>>
         >>> # Create metric instance
-        >>> metric = AnswerSimilarity(embeddings=embeddings)
+        >>> metric = SemanticSimilarity(embeddings=embeddings)
         >>>
         >>> # Single evaluation
         >>> result = await metric.ascore(
@@ -52,11 +56,11 @@ class AnswerSimilarity(BaseMetric):
     def __init__(
         self,
         embeddings: "BaseRagasEmbedding",
-        name: str = "answer_similarity",
+        name: str = "semantic_similarity",
         threshold: t.Optional[float] = None,
         **kwargs,
     ):
-        """Initialize AnswerSimilarity metric with required embeddings."""
+        """Initialize SemanticSimilarity metric with required embeddings."""
         self.embeddings = embeddings
         self.threshold = threshold
 
