@@ -74,14 +74,19 @@ By default, the quickstart example uses OpenAI. Set your API key and you're read
 
     Then update the LLM initialization in `evals.py`:
 
+    **Option 1: Using Google's Official Library (Recommended)**
+
     ```python
     import google.generativeai as genai
     from ragas.llms import llm_factory
 
     genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
-    client = genai.GenerativeModel("gemini-1.5-pro")
-    llm = llm_factory("gemini-1.5-pro", provider="google", client=client)
+    client = genai.GenerativeModel("gemini-2.0-flash")
+    llm = llm_factory("gemini-2.0-flash", provider="google", client=client)
+    # Adapter is auto-detected as "litellm" for google provider
     ```
+
+    For more Gemini options and detailed setup, see the [Google Gemini Integration Guide](../howtos/integrations/gemini.md).
 
 === "Local Models (Ollama)"
     Install and run Ollama locally, then update the LLM initialization in `evals.py`:
@@ -218,7 +223,7 @@ my_metric = DiscreteMetric(
 ## What's Next?
 
 - **Learn the concepts**: Read the [Evaluate a Simple LLM Application](evals.md) guide for deeper understanding
-- **Custom metrics**: [Write your own metrics](../howtos/customizations/metrics/_write_your_own_metric.md) tailored to your use case
+- **Custom metrics**: [Create your own metrics](../concepts/metrics/overview/index.md#output-types) using simple decorators
 - **Production integration**: [Integrate evaluations into your CI/CD pipeline](../howtos/index.md)
 - **RAG evaluation**: Evaluate [RAG systems](rag_eval.md) with specialized metrics
 - **Agent evaluation**: Explore [AI agent evaluation](../howtos/applications/text2sql.md)
@@ -228,4 +233,4 @@ my_metric = DiscreteMetric(
 
 - 📚 [Full Documentation](https://docs.ragas.io/)
 - 💬 [Join our Discord Community](https://discord.gg/5djav8GGNZ)
-- 🐛 [Report Issues](https://github.com/explodinggradients/ragas/issues)
+- 🐛 [Report Issues](https://github.com/vibrantlabsai/ragas/issues)

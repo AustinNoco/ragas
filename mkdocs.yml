@@ -1,8 +1,8 @@
 site_name: Ragas
 site_description: Evaluation framework for your AI Application
 site_url: !ENV READTHEDOCS_CANONICAL_URL
-repo_name: explodinggradients/ragas
-repo_url: https://github.com/explodinggradients/ragas
+repo_name: vibrantlabsai/ragas
+repo_url: https://github.com/vibrantlabsai/ragas
 watch:
   - src
 
@@ -11,8 +11,8 @@ nav:
   - "": index.md
   - 🚀 Get Started:
       - getstarted/index.md
-      - Quick Start: getstarted/quickstart.md
       - Installation: getstarted/install.md
+      - Quick Start: getstarted/quickstart.md
       - Tutorials:
           - Evaluate a prompt: tutorials/prompt.md
           - Evaluate a simple RAG system: tutorials/rag.md
@@ -82,27 +82,29 @@ nav:
           - Evaluation:
               - Evaluation Sample: concepts/components/eval_sample.md
               - Evaluation Dataset: concepts/components/eval_dataset.md
-  
+
   - 🛠️ How-to Guides:
       - howtos/index.md
       - Customizations:
           - howtos/customizations/index.md
           - General:
               - Customise models: howtos/customizations/customize_models.md
-              - Run Config: howtos/customizations/_run_config.md
+              - Run Config: howtos/customizations/run_config.md
               - Caching: howtos/customizations/_caching.md
               - Cancelling Tasks: howtos/customizations/cancellation.md
+          - LLM Adapters: howtos/llm-adapters.md
           - Metrics:
-              - Modify Prompts: howtos/customizations/metrics/_modifying-prompts-metrics.md
+              - Modify Prompts: howtos/customizations/metrics/modifying-prompts-metrics.md
               - Adapt Metrics to Languages: howtos/customizations/metrics/_metrics_language_adaptation.md
-              - Write your own Metrics: howtos/customizations/metrics/_write_your_own_metric.md
-              - Write your own Metrics - (advanced): howtos/customizations/metrics/_write_your_own_metric_advanced.md
               - Train and Align Metrics: howtos/customizations/metrics/train_your_own_metric.md
           - Testset Generation:
               - Non-English Testset Generation: howtos/customizations/testgenerator/_language_adaptation.md
               - Persona Generation: howtos/customizations/testgenerator/_persona_generator.md
               - Custom Single-hop Query: howtos/customizations/testgenerator/_testgen-custom-single-hop.md
               - Custom Multi-hop Query: howtos/customizations/testgenerator/_testgen-customisation.md
+              - Using Pre-chunked Data: howtos/customizations/testgenerator/prechunked_data.md
+          - Optimizers:
+              - DSPy Optimizer: howtos/customizations/optimizers/index.md
 
       - Applications:
           - howtos/applications/index.md
@@ -122,32 +124,44 @@ nav:
             - Align an LLM as a Judge: howtos/applications/align-llm-as-judge.md
           - RAG Evaluation:
             - Evaluate and Improve a RAG App: howtos/applications/evaluate-and-improve-rag.md
+      - CLI:
+          - howtos/cli/index.md
+          - RAG Evaluation: howtos/cli/rag_eval.md
+          - Improve RAG: howtos/cli/improve_rag.md
       - Integrations:
           - howtos/integrations/index.md
-          - Arize: howtos/integrations/_arize.md
-          - Amazon Bedrock: howtos/integrations/amazon_bedrock.md
-          - Haystack: howtos/integrations/haystack.md
-          - Griptape: howtos/integrations/griptape.md
-          - LangChain: howtos/integrations/langchain.md
-          - OCI Gen AI: howtos/integrations/oci_genai.md
-          - LangGraph: howtos/integrations/_langgraph_agent_evaluation.md
-          - LangSmith: howtos/integrations/langsmith.md
-          - LlamaIndex RAG: howtos/integrations/_llamaindex.md
-          - LlamaIndex Agents: howtos/integrations/llamaindex_agents.md
-          - LlamaStack: howtos/integrations/llama_stack.md
-          - R2R: howtos/integrations/r2r.md
-          - Swarm: howtos/integrations/swarm_agent_evaluation.md
+          - Observability:
+              - Arize: howtos/integrations/_arize.md
+              - LangSmith: howtos/integrations/langsmith.md
+          - LLM Providers:
+              - Amazon Bedrock: howtos/integrations/amazon_bedrock.md
+              - Google Gemini: howtos/integrations/gemini.md
+              - OCI Gen AI: howtos/integrations/oci_genai.md
+          - Frameworks:
+              - AG-UI: howtos/integrations/ag_ui.md
+              - Griptape: howtos/integrations/griptape.md
+              - Haystack: howtos/integrations/haystack.md
+              - LangChain: howtos/integrations/langchain.md
+              - LangGraph: howtos/integrations/_langgraph_agent_evaluation.md
+              - LlamaIndex: howtos/integrations/_llamaindex.md
+              - LlamaIndex Agents: howtos/integrations/llamaindex_agents.md
+              - LlamaStack: howtos/integrations/llama_stack.md
+              - R2R: howtos/integrations/r2r.md
+              - Swarm: howtos/integrations/swarm_agent_evaluation.md
       - Migrations:
           - From v0.1 to v0.2: howtos/migrations/migrate_from_v01_to_v02.md
+          - From v0.3 to v0.4: howtos/migrations/migrate_from_v03_to_v04.md
   - 📖 References:
     - references/index.md
     - Core:
       - Prompt: references/prompt.md
       - LLMs: references/llms.md
       - Embeddings: references/embeddings.md
+      - Tokenizers: references/tokenizers.md
       - RunConfig: references/run_config.md
       - Executor: references/executor.md
       - Cache: references/cache.md
+      - Optimizers: references/optimizers.md
     - Evaluation:
       - Schemas: references/evaluation_schema.md
       - Metrics: references/metrics.md
@@ -249,15 +263,55 @@ extra:
     provider: google
     property: !ENV GOOGLE_ANALYTICS_KEY
 plugins:
+  - search
   - social:
       enabled: !ENV [MKDOCS_CI, true]
-  - search
+  - copy-to-llm:
+      repo_url: "https://raw.githubusercontent.com/vibrantlabsai/ragas/main/docs"
+      buttons:
+        copy_page: true
+        copy_markdown_link: false  # Disabled until plugin bug is fixed
+        view_as_markdown: false    # Disabled until plugin bug is fixed
+        open_in_chatgpt: true
+        open_in_claude: true
+  - llmstxt:
+      markdown_description: |
+        Ragas is an open-source evaluation framework for LLM applications including RAG pipelines,
+        AI agents, and workflows. It provides objective metrics for evaluation, test data generation
+        capabilities, and integrations with popular LLM frameworks like LangChain and LlamaIndex.
+      full_output: llms-full.txt
+      sections:
+        Getting Started:
+          - getstarted/*.md
+        Tutorials:
+          - tutorials/*.md
+        Core Concepts:
+          - concepts/*.md
+          - concepts/components/*.md
+        Metrics:
+          - concepts/metrics/overview/*.md
+          - concepts/metrics/available_metrics/*.md
+        Test Data Generation:
+          - concepts/test_data_generation/*.md
+        Customization Guides:
+          - howtos/customizations/*.md
+          - howtos/customizations/metrics/*.md
+          - howtos/customizations/testgenerator/*.md
+          - howtos/customizations/optimizers/*.md
+        Application Guides:
+          - howtos/applications/*.md
+        CLI:
+          - howtos/cli/*.md
+        Integrations:
+          - howtos/integrations/*.md
+        API Reference:
+          - references/*.md
   - git-revision-date-localized:
       enabled: !ENV [MKDOCS_CI, false]
       enable_creation_date: true
   - git-committers:
       enabled: !ENV [MKDOCS_CI, false]
-      repository: explodinggradients/ragas
+      repository: vibrantlabsai/ragas
       branch: main
   - mkdocstrings:
       handlers:

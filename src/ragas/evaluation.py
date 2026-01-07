@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing as t
+import warnings
 from uuid import UUID
 
 from datasets import Dataset
@@ -21,6 +22,7 @@ from ragas.embeddings.base import (
     BaseRagasEmbedding,
     BaseRagasEmbeddings,
     LangchainEmbeddingsWrapper,
+    _infer_embedding_provider_from_llm,
     embedding_factory,
 )
 from ragas.exceptions import ExceptionInRunner
@@ -28,8 +30,8 @@ from ragas.executor import Executor
 from ragas.integrations.helicone import helicone_config
 from ragas.llms import llm_factory
 from ragas.llms.base import BaseRagasLLM, InstructorBaseRagasLLM, LangchainLLMWrapper
-from ragas.metrics import AspectCritic
 from ragas.metrics._answer_correctness import AnswerCorrectness
+from ragas.metrics._aspect_critic import AspectCritic
 from ragas.metrics.base import (
     Metric,
     MetricWithEmbeddings,
@@ -100,6 +102,14 @@ async def aevaluate(
     asyncio.run(main())
     ```
     """
+    warnings.warn(
+        "aevaluate() is deprecated and will be removed in a future version. "
+        "Use the @experiment decorator instead. "
+        "See https://docs.ragas.io/en/latest/concepts/experiment/ for more information.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
     column_map = column_map or {}
     callbacks = callbacks or []
     run_config = run_config or RunConfig()
@@ -126,12 +136,10 @@ async def aevaluate(
 
     # default metrics
     if metrics is None:
-        from ragas.metrics import (
-            answer_relevancy,
-            context_precision,
-            context_recall,
-            faithfulness,
-        )
+        from ragas.metrics._answer_relevance import answer_relevancy
+        from ragas.metrics._context_precision import context_precision
+        from ragas.metrics._context_recall import context_recall
+        from ragas.metrics._faithfulness import faithfulness
 
         metrics = [answer_relevancy, context_precision, faithfulness, context_recall]
 
@@ -173,7 +181,15 @@ async def aevaluate(
             llm_changed.append(i)
         if isinstance(metric, MetricWithEmbeddings) and metric.embeddings is None:
             if embeddings is None:
-                embeddings = embedding_factory()
+                # Infer embedding provider from LLM if available
+                inferred_provider = _infer_embedding_provider_from_llm(llm)
+                # Extract client from LLM if available for modern embeddings
+                embedding_client = None
+                if hasattr(llm, "client"):
+                    embedding_client = getattr(llm, "client")
+                embeddings = embedding_factory(
+                    provider=inferred_provider, client=embedding_client
+                )
             metric.embeddings = embeddings
             embeddings_changed.append(i)
         if isinstance(metric, AnswerCorrectness):
@@ -428,6 +444,13 @@ def evaluate(
     'answer_relevancy': 0.874}
     ```
     """
+    warnings.warn(
+        "evaluate() is deprecated and will be removed in a future version. "
+        "Use the @experiment decorator instead. "
+        "See https://docs.ragas.io/en/latest/concepts/experiment/ for more information.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     # Create async wrapper for aevaluate
     async def _async_wrapper():
